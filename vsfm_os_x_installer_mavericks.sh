@@ -164,10 +164,14 @@ else
 	echoGood "Your version of XQuartz is 2.7.6 - perfect."
 fi
 
+
+
 lineBreak; echo "Ok, now you have to should have either...";lineBreak
 echo "1. Already had the correct version of XQuartz, so I'm continuing...";lineBreak
 echo "2. Had to have installed XQuartz and just logged out and back in...";lineBreak
 echo "Ready to continue the next installation of VSFM & PMVS   (press ENTER)";lineBreak
+read nothing
+
 
 echo "Installing Brew packages... this can take quite a long time"
 
@@ -181,7 +185,7 @@ function installVSFM () {
 	VSFM_SRC=http://ccwu.me/vsfm/download/VisualSFM_osx_64bit.zip
 
 if [[ ! -f $VSFM_ZIP ]]; then
-		echoBadd "VSFM Zip not present, downloading..."    
+		echoBad "VSFM Zip not present, downloading..."
 		wget $VSFM_SRC -O VisualSFM_osx_64bit.zip
 		unzip $VSFM_ZIP
 	else
@@ -393,10 +397,15 @@ cp CMVS-PMVS-master/program/build/main/cmvs vsfm/bin
 makeVSFMdir
 if [[ $? -eq 0 ]]; then
 			echoGood "Success!  Opening VSFM dir"
-			echoGood "To run from command line make sure the directory you finally locate VSFM is in your PATH"
-			open vsfm/bin/
+            echoBad "To add to your PATH, add the lines below to your ~/.bash_profile file."
+            echoBad "export PATH=$PWD/vsfm/build:\$PATH"
+            echoGood "Make sure you ammend that that path if you move the directory."
+            open vsfm/bin/
 		else
 			echoBad "Failure.  End of script"		
 		exit
 	fi
+
+
+
 ### END OF SCRIPT
