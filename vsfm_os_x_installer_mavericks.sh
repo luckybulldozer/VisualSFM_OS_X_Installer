@@ -1,7 +1,9 @@
 #!/bin/bash
 # Visual SFM installer for OS X
 #
-# Copyright Dan Monaghan 2014
+# Copyright Dan Monaghan 2014 www.luckybulldozer.com
+#
+# Please check out our short film Sifted at http://www.vimeo.com/69136384
 # 
 # Should be as simple as it gets!
 #
@@ -22,9 +24,58 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #
+#
+# Credits go to Changchang Wu for VisualSFM
+# Structure from Motion
+# [1] Changchang Wu, "Towards Linear-time Incremental Structure From
+# Motion", 3DV 2013
+# [2] Changchang Wu, "VisualSFM: A Visual Structure from Motion System",
+# http://ccwu.me/vsfm/, 2011
+#
+# + Bundle Adjustment
+# [3] Changchang Wu, Sameer Agarwal, Brian Curless, and Steven M. Seitz,
+# "Multicore Bundle Adjustment", CVPR 2011
+#
+#
+#  Feature Detection
+# [4] Changchang Wu, "SiftGPU: A GPU implementation of Scale Invaraint
+# Feature Transform (SIFT)", http://cs.unc.edu/~ccwu/siftgpu, 2007
+#
+#
+# PMVS2  Yasutaka Furukawa http://www.cs.washington.edu/homes/furukawa/
+#
+# [Initial Cmake multiplatform port ]	Pierre moulon pmoulon[AT]gmail.com
+# [CMVS/PMVS] http://http://grail.cs.washington.edu/software/cmvs/
+# [CMake version] http://opensourcephotogrammetry.blogspot.com/
+# https://github.com/TheFrenchLeaf/CMVS-PMVS
+#
+# Graclus -- Efficient graph clustering software for normalized cut and ratio association on undirected graphs.
+#
+# Copyright(c) 2008 Brian Kulis, Yuqiang Guan (version 1.2)
+#
+# http://www.cs.utexas.edu/users/dml/Software/graclus.html/
+#
+# Homebrew
+#
+# http://mxcl.github.com/homebrew/
+#
+#
+# Big thanks for Iván Rodríguez Murillo's original OS X installer
+# https://github.com/iromu
 
+
+
+
+
+#### Let the script begin.
+
+
+# check if script has been run as root, it should be.
+if [[ $EUID -eq 0 ]]; then
+echo "This script should not need to be run as root.  Exiting"
+exit 1
+fi
 
 # function Declarations defined below...
 
