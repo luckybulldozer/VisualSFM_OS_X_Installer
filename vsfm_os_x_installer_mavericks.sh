@@ -84,16 +84,20 @@ echo ""
 }
 
 function echoGood () {
+#echos green text to stand out for succesful execution of a task
+#      ... hmmm default os x terminal is green text...
 INPUT_TEXT=$1
 printf "\e[0;32m${INPUT_TEXT}\e[0m\n"
 }
 
 function echoBad () {
+#echos red text to stand out for a fail/warning
 INPUT_TEXT=$1
 printf "\e[0;31m${INPUT_TEXT}\e[0m\n"
 }
 
 function checkBrew() {
+#check if a particualar brew is installed - not used much as brew does this pretty well already.
 if which $1 >/dev/null;
 	then 
 		echo "$1 is already installed, OK"
@@ -107,7 +111,7 @@ function installBrews () {
 		brew install jpeg
 		brew install gdk-pixbuf --cc=llvm-gcc
 		brew install cairo
-	    	brew install freetype
+        brew install freetype
 		brew link freetype
 		brew install pango
 		brew link pixman
@@ -131,15 +135,15 @@ function installBrews () {
 
 
 echo ""
-echoGood "Dan Monaghan's VSFM and PMVS installer of OS X"
+echoGood "Dan Monaghan's VSFM and PMVS installer for OS X"
 echo ""
 
 echo "About to check to see if you have the Brew Package Manager"
 if which brew >/dev/null; 
 	then
-	     echoGood "Sweet, you've got brew... Continuing"
+	     echoGood "Great, you've got brew... Continuing"
 	else
-	     echoGood "Nope, Ok I will install... you'll have to enter your root password at somestage to complete." 
+	     echoGood "No, Ok I will install brew... you'll have to enter your root password if Xcode command line tools are needed to complete."
 		ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 fi
 
@@ -159,7 +163,7 @@ then
 	echoBad "We must download the right version of XQuartz... one moment while we install"
 	wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg 
 	open XQuartz-2.7.6.dmg
-	echo "Switch to finder and install XQuartz as per the installer. Then log in and out and then run script 2"
+	echo "Switch to Finder and install XQuartz as per the installer. Then log in and out and then run script 2"
 else
 	echoGood "Your version of XQuartz is 2.7.6 - perfect."
 fi
@@ -175,8 +179,10 @@ read nothing
 
 echo "Installing Brew packages... this can take quite a long time"
 
-# installBrews
+#############
 installBrews
+#############
+
 # installing VSFM Section
 
 function installVSFM () {
@@ -184,7 +190,7 @@ function installVSFM () {
     VSFM_ZIP=VisualSFM_osx_64bit.zip
 	VSFM_SRC=http://ccwu.me/vsfm/download/VisualSFM_osx_64bit.zip
 
-if [[ ! -f $VSFM_ZIP ]]; then
+    if [[ ! -f $VSFM_ZIP ]]; then
 		echoBad "VSFM Zip not present, downloading..."
 		wget $VSFM_SRC -O VisualSFM_osx_64bit.zip
 		unzip $VSFM_ZIP
@@ -192,10 +198,10 @@ if [[ ! -f $VSFM_ZIP ]]; then
 		echoGood "Zip file is present, so just unzipping, removing old dir to install so we don't have any conflicts"
 		rm -fR vsfm
 		unzip $VSFM_ZIP
-fi
+    fi
 
 cd vsfm
-
+####### makefile Patches
 	echo "Changing VSFM GCC to Brews gcc-4.8"
 	S=$(echo CC = g++ -w | sed -e 's/\//\\\//g')
 	R=$(echo CC = g++-4.8 -w | sed -e 's/\//\\\//g')
@@ -207,38 +213,42 @@ cd vsfm
 	sed -i '' -e "s/${S}/${R}/" makefile
 	
 	echoGood "About to make..."
-	make -f makefile	
-if [[ $? -eq 0 ]]; then
-		echoGood "VSFM application built... moving on"
-	else
-		echoBad "VSFM application failed to build, halting."
-	exit
-fi
+	make -f makefile
+    if [[ $? -eq 0 ]]; then
+            echoGood "VSFM application built... moving on"
+        else
+            echoBad "VSFM application failed to build, halting."
+        exit
+    fi
 
 cd ..
 
 }
-
+#############
 installVSFM
+#############
 
-##### SIFT GPU PHASE
+
+
+
 
 function installSiftGPU () {
 
 	SIFT_GPU_SRC=http://wwwx.cs.unc.edu/~ccwu/cgi-bin/siftgpu.cgi
 	SIFT_GPU_ZIP=sift_gpu.zip
 
-if [[ ! -f $SIFT_GPU_ZIP ]]; then
-    echoBad "SiftGPU Zip not present, downloading..."    
-	wget $SIFT_GPU_SRC -O $SIFT_GPU_ZIP 
-	unzip $SIFT_GPU_ZIP    
-	else
-	echo "LIB_SIFT_GPU is present, skipping download and unzip. removing old dir to install so we don't have any conflicts"
-                 rm -fR SiftGPU
-	unzip $SIFT_GPU_ZIP
-fi
+    if [[ ! -f $SIFT_GPU_ZIP ]]; then
+        echoBad "SiftGPU Zip not present, downloading..."    
+        wget $SIFT_GPU_SRC -O $SIFT_GPU_ZIP 
+        unzip $SIFT_GPU_ZIP    
+    else
+        echo "LIB_SIFT_GPU is present, skipping download and unzip. removing old dir to install so we don't have any conflicts"
+        rm -fR SiftGPU
+        unzip $SIFT_GPU_ZIP
+    fi
 
 cd SiftGPU
+####### makefile Patches
 	echo "Changing SiftGPU GCC to Brews gcc-4.8"
 	S=$(echo CC = g++ | sed -e 's/\//\\\//g')
 	R=$(echo CC = g++-4.8 -w | sed -e 's/\//\\\//g')
@@ -272,35 +282,39 @@ cd SiftGPU
 make siftgpu
 	if [[ $? -eq 0 ]]; then
 			echoGood "libsiftgpu.so built... moving on"
-		else
+    else
 			echoBad "libsiftgpu.so failed to build.  Halting."
-		
-		exit
+            exit
 	fi
 
 cd ..
 
 }
-
+#############
 installSiftGPU
+#############
+
+
+
+
 
 function installPBA () {
 
-	LIB_PBA_SRC=http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip
-	LIB_PBA_ZIP=pba_v1.0.5.zip
+LIB_PBA_SRC=http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip
+LIB_PBA_ZIP=pba_v1.0.5.zip
 
 if [[ ! -f $LIB_PBA_ZIP ]]; then
     echo "VSFM Zip not present, downloading..."    
 	wget $LIB_PBA_SRC -O $LIB_PBA_ZIP 
 	unzip $LIB_PBA_ZIP    
-	else
+else
 	echo "LIB_PBA is present, skipping download and unzip, removing old dir to install so we don't have any conflicts"
-                 rm -fR pba
+    rm -fR pba
 	unzip $LIB_PBA_ZIP 
 fi
 
 cd pba
-
+####### makefile_no_gpu Patches
 	echo "Changing SiftGPU GCC to Brews gcc-4.8"
 	S=$(echo CC = g++ | sed -e 's/\//\\\//g')
 	R=$(echo CC = g++-4.8 -w | sed -e 's/\//\\\//g')
@@ -338,29 +352,30 @@ make -f makefile_no_gpu pba
 cd ..
 
 }
-
+#############
 installPBA
+#############
+
+
 
 function installPMVS () {
-#set flags for cmake to honor
-#export CXX=/usr/local/opt/gcc48/bin/g++-4.8
-#export CC=/usr/local/opt/gcc48/bin/gcc-4.8
 
 PMVS_ZIP=PMVS_pmoulonGit.zip
 PMVS_SRC=https://github.com/pmoulon/CMVS-PMVS/archive/master.zip
 
-if [[ ! -f $PMVS_ZIP ]]; then
-		echoBad "PMVS Zip not present, downloading..."    
-		wget $PMVS_SRC -O $PMVS_ZIP
-		unzip $PMVS_ZIP
-	else
-		echoGood "Zip file is present, so just unzipping, removing old dir to install so we dont have any conflicts"
-                rm -fR CMVS-PMVS-master
-		unzip $PMVS_ZIP
-fi
+    if [[ ! -f $PMVS_ZIP ]]; then
+        echoBad "PMVS Zip not present, downloading..."    
+        wget $PMVS_SRC -O $PMVS_ZIP
+        unzip $PMVS_ZIP
+    else
+        echoGood "Zip file is present, so just unzipping, removing old dir to install so we dont have any conflicts"
+        rm -fR CMVS-PMVS-master
+        unzip $PMVS_ZIP
+    fi
 
 cd CMVS-PMVS-master/program
 
+####### CMakeLists.txt Patches
 	echo "Adding set CMAKE_EXE_LINKER_FLAGS -static-libgcc -static-libstdc++ to cmake flags"
 	cat ../../patches/cflag_var > temp
 	cat CMakeLists.txt >> temp
@@ -373,17 +388,21 @@ cd CMVS-PMVS-master/program
 	make	
 	if [[ $? -eq 0 ]]; then
 			echoGood "CMVS & PMVS built... moving on"
-		else
+    else
 			echoBad "libpba.so failed to build, halting...."		
-		exit
+            exit
 	fi
 
 cd ../../..
 echoGood $PWD
 
 }
-
+#############
 installPMVS
+#############
+
+
+
 
 function makeVSFMdir () {
 
@@ -393,8 +412,9 @@ cp CMVS-PMVS-master/program/build/main/pmvs2 vsfm/bin
 cp CMVS-PMVS-master/program/build/main/genOption vsfm/bin
 cp CMVS-PMVS-master/program/build/main/cmvs vsfm/bin
 } 
-
+#############
 makeVSFMdir
+#############
 if [[ $? -eq 0 ]]; then
 			echoGood "Success!  Opening VSFM dir"
             echoBad "To add to your PATH, add the lines below to your ~/.bash_profile file."
