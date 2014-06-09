@@ -71,7 +71,7 @@
 #### Let the script begin.
 
 
-# check if script has been run as root, it should be.
+# check if script has been run as root, it shouldn't be.
 if [[ $EUID -eq 0 ]]; then
 echo "This script should not need to be run as root.  Exiting"
 exit 1
