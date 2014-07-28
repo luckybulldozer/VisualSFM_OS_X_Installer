@@ -215,9 +215,9 @@ cd vsfm
 	echoGood "About to make..."
 	make -f makefile
     if [[ $? -eq 0 ]]; then
-            echoGood "VSFM application built... moving on"
-        else
-            echoBad "VSFM application failed to build, halting."
+        echoGood "VSFM application built... moving on"
+    else
+        echoBad "VSFM application failed to build, halting."
         exit
     fi
 
@@ -281,10 +281,10 @@ cd SiftGPU
 
 make siftgpu
 	if [[ $? -eq 0 ]]; then
-			echoGood "libsiftgpu.so built... moving on"
+        echoGood "libsiftgpu.so built... moving on"
     else
-			echoBad "libsiftgpu.so failed to build.  Halting."
-            exit
+        echoBad "libsiftgpu.so failed to build.  Halting."
+        exit
 	fi
 
 cd ..
@@ -303,15 +303,15 @@ function installPBA () {
 LIB_PBA_SRC=http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip
 LIB_PBA_ZIP=pba_v1.0.5.zip
 
-if [[ ! -f $LIB_PBA_ZIP ]]; then
-    echo "VSFM Zip not present, downloading..."    
-	wget $LIB_PBA_SRC -O $LIB_PBA_ZIP 
-	unzip $LIB_PBA_ZIP    
-else
-	echo "LIB_PBA is present, skipping download and unzip, removing old dir to install so we don't have any conflicts"
-    rm -fR pba
-	unzip $LIB_PBA_ZIP 
-fi
+    if [[ ! -f $LIB_PBA_ZIP ]]; then
+        echo "VSFM Zip not present, downloading..."    
+        wget $LIB_PBA_SRC -O $LIB_PBA_ZIP 
+        unzip $LIB_PBA_ZIP    
+    else
+        echo "LIB_PBA is present, skipping download and unzip, removing old dir to install so we don't have any conflicts"
+        rm -fR pba
+        unzip $LIB_PBA_ZIP 
+    fi
 
 cd pba
 ####### makefile_no_gpu Patches
