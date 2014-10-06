@@ -1,2 +1,4 @@
-set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
-set(CMAKE_PREFIX_PATH "/usr/local/Cellar/boost/1.55.0_1/include/boost/graph/")
+find_package(Boost REQUIRED)
+if(${Boost_FOUND}) 
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
