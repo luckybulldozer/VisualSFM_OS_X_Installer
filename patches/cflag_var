@@ -1,3 +1,6 @@
+set(ENV{BOOST_ROOT} "/usr/local/Cellar/boost/1.56.0")
+set(ENV{BOOST_INCLUDEDIR} "/usr/local/include/boost")
+set(CMAKE_PREFIX_PATH "/usr/local/include")
 find_package(Boost REQUIRED)
 if(${Boost_FOUND}) 
   include_directories(${Boost_INCLUDE_DIRS})
