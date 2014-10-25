@@ -144,7 +144,9 @@ if which brew >/dev/null;
 	     echoGood "Great, you've got brew... Continuing"
 	else
 	     echoGood "No, Ok I will install brew... you'll have to enter your root password if Xcode command line tools are needed to complete."
-		ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+# old path	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+		ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
 fi
 
 
