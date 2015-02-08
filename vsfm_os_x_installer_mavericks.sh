@@ -130,6 +130,12 @@ function installBrews () {
 
 }
 
+function installXcodeSelect () {
+	echoGood "About to install xcode select"
+	echoBad "Hit Enter after it's installed"
+	xcode-select --install
+}
+
 
 ############## int main.... lol
 
@@ -153,6 +159,8 @@ fi
 checkBrew wget
 #checkBrew function defined at bottom
 
+#instal xcode select
+installXcodeSelect
 
 # check to see if we have the right XQuartz....
 
