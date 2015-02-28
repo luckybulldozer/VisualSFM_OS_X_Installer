@@ -266,7 +266,7 @@ cd SiftGPU
 	
 	echo "Disable Cuda Flags"
 	S=$(echo siftgpu_enable_cuda = 1 | sed -e 's/\//\\\//g')
-	R=$(echo siftgpu_enable_cuda = 0 's/\//\\\//g')
+	R=$(echo siftgpu_enable_cuda = 0 | sed -e 's/\//\\\//g')
 	sed -i '' -e "s/${S}/${R}/" makefile
 	
 	echo "Changing march from native core2 in makefile"
