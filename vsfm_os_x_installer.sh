@@ -166,9 +166,9 @@ installXcodeSelect
 
 echo "Checking we have the right version of XQuartz"
 echo ""
-cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}' | grep 2.7.6 && echo "Good" || echo "Not good..."
-echo ""
-if [ $? -ne 0 ]
+cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}' | grep 2.7.6 && xquartz_version_result="0" || echo xquartz_version_result="1"
+echo "xquartz_version_result=$xquartz_version_result"
+if [ "$xquartz_version_result" != "0" ]
 then 
 	echoBad "We must download the right version of XQuartz... one moment while we install"
 	wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg 
@@ -177,7 +177,6 @@ then
 else
 	echoGood "Your version of XQuartz is 2.7.6 - perfect."
 fi
-
 
 
 lineBreak; echo "Ok, now you have to should have either...";lineBreak
