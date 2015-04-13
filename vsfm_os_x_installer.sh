@@ -125,6 +125,7 @@ function installBrews () {
 		brew tap homebrew/versions
 		brew install gcc48
 		brew install devil
+		brew install pkg-config
 #maybe....
 #		brew install mesalib-glw
 
