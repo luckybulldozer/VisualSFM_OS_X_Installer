@@ -4,7 +4,7 @@
 # Copyright Dan Monaghan 2014 www.luckybulldozer.com
 #
 # Please check out our short film Sifted at http://www.vimeo.com/69136384
-# 
+#
 # Should be as simple as it gets!
 #
 # To run, cd into the directory of the installer and simply execute this script via…
@@ -99,7 +99,7 @@ printf "\e[0;31m${INPUT_TEXT}\e[0m\n"
 function checkBrew() {
 #check if a particualar brew is installed - not used much as brew does this pretty well already.
 if which $1 >/dev/null;
-	then 
+	then
 		echo "$1 is already installed, OK"
 	else
 		echo "$1 is not installed... brewing now."
@@ -110,20 +110,20 @@ if which $1 >/dev/null;
 function installBrews () {
 		brew install jpeg
 		brew install gdk-pixbuf --cc=llvm-gcc
-		brew install cairo
+		brew install cairo --with-x11
         brew install freetype
 		brew link freetype
 		brew install pango
 		brew link pixman
 		brew link fontconfig
-		brew install gtk+
+		brew install https://raw.githubusercontent.com/Homebrew/homebrew/99126a50c96b3c832d72f4531c116271f543eded/Library/Formula/gtk+.rb
 		brew install glew
 		brew install gsl
 		brew install boost
 		brew install intltool
 		brew install cmake
 		brew tap homebrew/versions
-		brew install gcc48
+		brew install gcc49
 		brew install devil
 		brew install pkg-config
 #maybe....
@@ -146,7 +146,7 @@ echoGood "Dan Monaghan's VSFM and PMVS installer for OS X"
 echo ""
 
 echo "About to check to see if you have the Brew Package Manager"
-if which brew >/dev/null; 
+if which brew >/dev/null;
 	then
 	     echoGood "Great, you've got brew... Continuing"
 	else
@@ -167,12 +167,12 @@ installXcodeSelect
 
 echo "Checking we have the right version of XQuartz"
 echo ""
-cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}' | grep 2.7.6 && xquartz_version_result="0" || echo xquartz_version_result="1"
+cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}' | grep 2.7.8 && xquartz_version_result="0" || echo xquartz_version_result="1"
 echo "xquartz_version_result=$xquartz_version_result"
 if [ "$xquartz_version_result" != "0" ]
-then 
+then
 	echoBad "We must download the right version of XQuartz... one moment while we install"
-	wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg 
+	wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg
 	open XQuartz-2.7.6.dmg
 	echo "Switch to Finder and install XQuartz as per the installer. Then log in and out and then run script 2"
 else
@@ -212,16 +212,16 @@ function installVSFM () {
 
 cd vsfm
 ####### makefile Patches
-	echo "Changing VSFM GCC to Brews gcc-4.8"
+	echo "Changing VSFM GCC to Brews gcc-4.9"
 	S=$(echo CC = g++ -w | sed -e 's/\//\\\//g')
-	R=$(echo CC = g++-4.8 -w | sed -e 's/\//\\\//g')
+	R=$(echo CC = g++-4.9 -w | sed -e 's/\//\\\//g')
 	sed -i '' -e "s/${S}/${R}/" makefile
-	
+
 	echo "Changing /usr/x11/lib to OS X default /opt/x11/lib"
 	S=$(echo -L/usr/x11/lib | sed -e 's/\//\\\//g')
 	R=$(echo -L/opt/X11/lib | sed -e 's/\//\\\//g')
 	sed -i '' -e "s/${S}/${R}/" makefile
-	
+
 	echoGood "About to make..."
 	make -f makefile
     if [[ $? -eq 0 ]]; then
@@ -248,9 +248,9 @@ function installSiftGPU () {
 	SIFT_GPU_ZIP=sift_gpu.zip
 
     if [[ ! -f $SIFT_GPU_ZIP ]]; then
-        echoBad "SiftGPU Zip not present, downloading..."    
-        wget $SIFT_GPU_SRC -O $SIFT_GPU_ZIP 
-        unzip $SIFT_GPU_ZIP    
+        echoBad "SiftGPU Zip not present, downloading..."
+        wget $SIFT_GPU_SRC -O $SIFT_GPU_ZIP
+        unzip $SIFT_GPU_ZIP
     else
         echo "LIB_SIFT_GPU is present, skipping download and unzip. removing old dir to install so we don't have any conflicts"
         rm -fR SiftGPU
@@ -259,34 +259,39 @@ function installSiftGPU () {
 
 cd SiftGPU
 ####### makefile Patches
-	echo "Changing SiftGPU GCC to Brews gcc-4.8"
-	S=$(echo CC = g++ | sed -e 's/\//\\\//g')
-	R=$(echo CC = g++-4.8 -w | sed -e 's/\//\\\//g')
-	sed -i '' -e "s/${S}/${R}/" makefile
-	
+	# echo "Changing SiftGPU GCC to Brews gcc-4.9"
+	# S=$(echo CC = g++ | sed -e 's/\//\\\//g')
+	# R=$(echo CC = g++-4.9 -w | sed -e 's/\//\\\//g')
+	# sed -i '' -e "s/${S}/${R}/" makefile
+
 	echo "Disable Cuda Flags"
 	S=$(echo siftgpu_enable_cuda = 1 | sed -e 's/\//\\\//g')
 	R=$(echo siftgpu_enable_cuda = 0 | sed -e 's/\//\\\//g')
 	sed -i '' -e "s/${S}/${R}/" makefile
-	
+
 	echo "Changing march from native core2 in makefile"
 	S=$(echo native | sed -e 's/\//\\\//g')
 	R=$(echo core2 | sed -e 's/\//\\\//g')
-	sed -i '' -e "s/${S}/${R}/" makefile	
+	sed -i '' -e "s/${S}/${R}/" makefile
 
 	echo "Changing to prefer GLUT"
 	S=$(echo siftgpu_prefer_glut = 0 | sed -e 's/\//\\\//g')
 	R=$(echo siftgpu_prefer_glut = 1 | sed -e 's/\//\\\//g')
-	sed -i '' -e "s/${S}/${R}/" makefile		
+	sed -i '' -e "s/${S}/${R}/" makefile
 
 	echo "Removing -L/opt/local/lib from makefile"
 	S=$(echo -L/opt/local/lib | sed -e 's/\//\\\//g')
 	R=$(echo | sed -e 's/\//\\\//g')
 	sed -i '' -e "s/${S}/${R}/" makefile
-	
+
 	echo "Changing /usr/x11/lib to OS X default /opt/x11/lib"
 	S=$(echo -L/usr/x11/lib | sed -e 's/\//\\\//g')
 	R=$(echo -L/opt/X11/lib | sed -e 's/\//\\\//g')
+	sed -i '' -e "s/${S}/${R}/" makefile
+
+	echo "Disable TestWin build for this OS X build"
+	S=$(echo '$(CC) -o $(BIN_DIR)/TestWinGlut $(SRC_TESTWIN) $(LIBS_DRIVER) $(CFLAGS)' | sed -e 's/\//\\\//g')
+	R=$(echo | sed -e 's/\//\\\//g')
 	sed -i '' -e "s/${S}/${R}/" makefile
 
 make siftgpu
@@ -314,37 +319,37 @@ LIB_PBA_SRC=http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip
 LIB_PBA_ZIP=pba_v1.0.5.zip
 
     if [[ ! -f $LIB_PBA_ZIP ]]; then
-        echo "VSFM Zip not present, downloading..."    
-        wget $LIB_PBA_SRC -O $LIB_PBA_ZIP 
-        unzip $LIB_PBA_ZIP    
+        echo "VSFM Zip not present, downloading..."
+        wget $LIB_PBA_SRC -O $LIB_PBA_ZIP
+        unzip $LIB_PBA_ZIP
     else
         echo "LIB_PBA is present, skipping download and unzip, removing old dir to install so we don't have any conflicts"
         rm -fR pba
-        unzip $LIB_PBA_ZIP 
+        unzip $LIB_PBA_ZIP
     fi
 
 cd pba
 ####### makefile_no_gpu Patches
-	echo "Changing SiftGPU GCC to Brews gcc-4.8"
+	echo "Changing SiftGPU GCC to Brews gcc-4.9"
 	S=$(echo CC = g++ | sed -e 's/\//\\\//g')
-	R=$(echo CC = g++-4.8 -w | sed -e 's/\//\\\//g')
+	R=$(echo CC = g++-4.9 -w | sed -e 's/\//\\\//g')
 	sed -i '' -e "s/${S}/${R}/" makefile_no_gpu
 
 	echo "Removing /usr/lib64 from makefile"
 	S=$(echo /usr/lib64 | sed -e 's/\//\\\//g')
 	R=$(echo | sed -e 's/\//\\\//g')
-	sed -i '' -e "s/${S}/${R}/" makefile_no_gpu	
-	
-	
+	sed -i '' -e "s/${S}/${R}/" makefile_no_gpu
+
+
 	echo "Changing march from native core2 in makefile"
 	S=$(echo native | sed -e 's/\//\\\//g')
 	R=$(echo core2 | sed -e 's/\//\\\//g')
-	sed -i '' -e "s/${S}/${R}/" makefile_no_gpu	
+	sed -i '' -e "s/${S}/${R}/" makefile_no_gpu
 
 	echo "Adding -L/usr/include/sys/ to compile Flags"
 	S=$(echo -L/usr/lib | sed -e 's/\//\\\//g')
 	R=$(echo -L/usr/lib -L/usr/include/sys/ | sed -e 's/\//\\\//g')
-	sed -i '' -e "s/${S}/${R}/" makefile_no_gpu	
+	sed -i '' -e "s/${S}/${R}/" makefile_no_gpu
 
 cp ../patches/SparseBundleCPU.patch src/pba/
 cd src/pba
@@ -355,7 +360,7 @@ make -f makefile_no_gpu pba
 	if [[ $? -eq 0 ]]; then
 			echoGood "libpba.so built... moving on"
 		else
-			echoBad "libpba.so failed to build, halting."		
+			echoBad "libpba.so failed to build, halting."
 		exit
 	fi
 
@@ -374,7 +379,7 @@ PMVS_ZIP=PMVS_pmoulonGit.zip
 PMVS_SRC=https://github.com/pmoulon/CMVS-PMVS/archive/master.zip
 
     if [[ ! -f $PMVS_ZIP ]]; then
-        echoBad "PMVS Zip not present, downloading..."    
+        echoBad "PMVS Zip not present, downloading..."
         wget $PMVS_SRC -O $PMVS_ZIP
         unzip $PMVS_ZIP
     else
@@ -395,11 +400,11 @@ cd CMVS-PMVS-master/program
 	cd build
 	echoGood $PWD
 	cmake . ..
-	make	
+	make
 	if [[ $? -eq 0 ]]; then
 			echoGood "CMVS & PMVS built... moving on"
     else
-			echoBad "libpba.so failed to build, halting...."		
+			echoBad "libpba.so failed to build, halting...."
             exit
 	fi
 
@@ -421,7 +426,7 @@ cp SiftGPU/bin/libsiftgpu.so vsfm/bin/
 cp CMVS-PMVS-master/program/build/main/pmvs2 vsfm/bin
 cp CMVS-PMVS-master/program/build/main/genOption vsfm/bin
 cp CMVS-PMVS-master/program/build/main/cmvs vsfm/bin
-} 
+}
 #############
 makeVSFMdir
 #############
@@ -432,7 +437,7 @@ if [[ $? -eq 0 ]]; then
             echoGood "Make sure you ammend that that path if you move the directory."
             open vsfm/bin/
 		else
-			echoBad "Failure.  End of script"		
+			echoBad "Failure.  End of script"
 		exit
 	fi
 
