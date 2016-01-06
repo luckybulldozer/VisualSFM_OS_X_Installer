@@ -434,6 +434,7 @@ if [[ $? -eq 0 ]]; then
 			echoGood "Success!  Opening VSFM dir"
             echoBad "To add to your PATH, add the lines below to your ~/.bash_profile file."
             echoBad "export PATH=$PWD/vsfm/bin:\$PATH"
+			echoBad "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$PWD"
             echoGood "Make sure you ammend that that path if you move the directory."
             open vsfm/bin/
 		else
