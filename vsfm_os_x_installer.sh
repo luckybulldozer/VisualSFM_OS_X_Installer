@@ -166,17 +166,18 @@ installXcodeSelect
 # check to see if we have the right XQuartz....
 
 echo "Checking we have the right version of XQuartz"
+xquartz="2.7.8"
 echo ""
-cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}' | grep 2.7.8 && xquartz_version_result="0" || echo xquartz_version_result="1"
+cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}' | grep $xquartz && xquartz_version_result="0" || echo xquartz_version_result="1"
 echo "xquartz_version_result=$xquartz_version_result"
 if [ "$xquartz_version_result" != "0" ]
 then
-	echoBad "We must download the right version of XQuartz... one moment while we install"
-	wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg
-	open XQuartz-2.7.6.dmg
+	echoBad "We must download the right version of XQuartz: $xquartz ... one moment while we install"
+	wget http://xquartz.macosforge.org/downloads/SL/XQuartz-$xquartz.dmg
+	open XQuartz-$xquartz.dmg
 	echo "Switch to Finder and install XQuartz as per the installer. Then log in and out and then run script 2"
 else
-	echoGood "Your version of XQuartz is 2.7.6 - perfect."
+	echoGood "Your version of XQuartz is $xquartz - perfect."
 fi
 
 
