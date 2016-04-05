@@ -173,7 +173,7 @@ echo "xquartz_version_result=$xquartz_version_result"
 if [ "$xquartz_version_result" != "0" ]
 then
 	echoBad "We must download the right version of XQuartz: $xquartz ... one moment while we install"
-	https://dl.bintray.com/xquartz/legacy-downloads/SL/XQuartz-$xquartz.dmg
+	wget https://dl.bintray.com/xquartz/legacy-downloads/SL/XQuartz-$xquartz.dmg
 	open XQuartz-$xquartz.dmg
 	echo "Switch to Finder and install XQuartz as per the installer. Then log in and out and then run script 2"
 else
