@@ -390,6 +390,7 @@ PMVS_SRC=https://github.com/pmoulon/CMVS-PMVS/archive/master.zip
     fi
 
 cd CMVS-PMVS-master/program
+patch base/stann/dpoint.hpp < ../../patches/dpoint_err.patch
 
 ####### CMakeLists.txt Patches
 	echo "Adding set CMAKE_EXE_LINKER_FLAGS -static-libgcc -static-libstdc++ to cmake flags"
