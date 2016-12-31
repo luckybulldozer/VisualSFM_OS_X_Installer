@@ -1,0 +1,13 @@
+--- program/base/stann/dpoint.hpp.orig	2016-12-30 16:46:41.000000000 +1030
++++ program/base/stann/dpoint.hpp	2016-12-30 16:49:39.000000000 +1030
+@@ -488,8 +488,8 @@
+ 	 for (int i=0; i<D; ++i)
+ 		 if(!(is >> p[i])){
+ 			 if(!is.eof()){
+-			   char errorpoint = is.getloc();
+-			   std::cerr << "Error Reading Point:" 
++			  streampos errorpoint = is.tellg(); 
++			  std::cerr << "Error Reading Point:" 
+ 				     << errorpoint << std::endl;
+ 				exit(1);
+ 			 }
