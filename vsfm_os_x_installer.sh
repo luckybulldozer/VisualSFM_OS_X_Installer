@@ -4,7 +4,6 @@
 # Copyright Dan Monaghan 2014 www.luckybulldozer.com
 #
 # Please check out our short film Sifted at http://www.vimeo.com/69136384
-#
 # Should be as simple as it gets!
 #
 # To run, cd into the directory of the installer and simply execute this script via…
@@ -73,32 +72,32 @@
 
 # check if script has been run as root, it shouldn't be.
 if [[ $EUID -eq 0 ]]; then
-echo "This script should not need to be run as root.  Exiting"
-exit 1
+	echo "This script should not need to be run as root.  Exiting"
+	exit 1
 fi
 
 # function Declarations defined below...
 
 function lineBreak (){
-echo ""
+	echo ""
 }
 
 function echoGood () {
-#echos green text to stand out for succesful execution of a task
-#      ... hmmm default os x terminal is green text...
-INPUT_TEXT=$1
-printf "\e[0;32m${INPUT_TEXT}\e[0m\n"
+	# echos green text to stand out for succesful execution of a task
+	#      ... hmmm default os x terminal is green text...
+	INPUT_TEXT=$1
+	printf "\e[0;32m${INPUT_TEXT}\e[0m\n"
 }
 
 function echoBad () {
-#echos red text to stand out for a fail/warning
-INPUT_TEXT=$1
-printf "\e[0;31m${INPUT_TEXT}\e[0m\n"
+	# echos red text to stand out for a fail/warning
+	INPUT_TEXT=$1
+	printf "\e[0;31m${INPUT_TEXT}\e[0m\n"
 }
 
 function checkBrew() {
-#check if a particualar brew is installed - not used much as brew does this pretty well already.
-if which $1 >/dev/null;
+	#check if a particualar brew is installed - not used much as brew does this pretty well already.
+	if which $1 >/dev/null ;
 	then
 		echo "$1 is already installed, OK"
 	else
@@ -116,6 +115,7 @@ function installBrews () {
 		brew install pango
 		brew link pixman
 		brew link fontconfig
+		brew unlink gtk+
 		brew install https://raw.githubusercontent.com/Homebrew/homebrew/99126a50c96b3c832d72f4531c116271f543eded/Library/Formula/gtk+.rb
 		brew install glew
 		brew install gsl
@@ -132,28 +132,33 @@ function installBrews () {
 }
 
 function installXcodeSelect () {
-	echoGood "About to install xcode select"
-	echoBad "Hit Enter after it's installed"
-	xcode-select --install
+	CMDTOOLSPKG="com.apple.pkg.CLTools_Executables"
+	CMDTOOLSNOTFOUND="No receipt for '${CMDTOOLSPKG}' found at '/'."
+	CMDTOOLSINFO=$(pkgutil --pkg-info=com.apple.pkg.CLTools_Executables)
+	if [ "$CMDTOOLSINFO" == "$CMDTOOLSNOTFOUND" ]
+	then
+		echoGood "About to install xcode select"
+		echoBad "Hit Enter after it's installed"
+		xcode-select --install
+	fi
 }
 
 
 ############## int main.... lol
 
 
-echo ""
+lineBreak
 echoGood "Dan Monaghan's VSFM and PMVS installer for OS X"
-echo ""
+lineBreak
 
 echo "About to check to see if you have the Brew Package Manager"
 if which brew >/dev/null;
 	then
-	     echoGood "Great, you've got brew... Continuing"
+	    echoGood "Great, you've got brew... Continuing"
 	else
-	     echoGood "No, Ok I will install brew... you'll have to enter your root password if Xcode command line tools are needed to complete."
-# old path	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+	    echoGood "No, Ok I will install brew... you'll have to enter your root password if Xcode command line tools are needed to complete."
+		# old path	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 		ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
 fi
 
 
@@ -165,21 +170,58 @@ installXcodeSelect
 
 # check to see if we have the right XQuartz....
 
+function installXQuartz () {
+	echoBad "We must download the right version of XQuartz... one moment while we install"
+	wget http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg
+	open XQuartz-2.7.6.dmg
+	echo "Switch to Finder and install XQuartz as per the installer. Then log in and out and then run script 2"
+}
+
 echo "Checking we have the right version of XQuartz"
 xquartz="2.7.8"
-echo ""
-cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}' | grep $xquartz && xquartz_version_result="0" || echo xquartz_version_result="1"
-echo "xquartz_version_result=$xquartz_version_result"
-if [ "$xquartz_version_result" != "0" ]
+lineBreak
+
+XQUARTZPKGID=$(pkgutil --pkgs=.*xquartz.*)
+if [ "$XQUARTZPKGID" != "" ]
 then
-	echoBad "We must download the right version of XQuartz: $xquartz ... one moment while we install"
-	wget http://xquartz.macosforge.org/downloads/SL/XQuartz-$xquartz.dmg
-	open XQuartz-$xquartz.dmg
-	echo "Switch to Finder and install XQuartz as per the installer. Then log in and out and then run script 2"
+	echo "Found package $XQUARTZPKGID"
+	
+	# To check if the exact required version is installed.
+	xquartz_installed_version=$(cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}')
+	
+	echo xquartz_installed_version | grep $xquartz && xquartz_version_result="0" || xquartz_version_result="1"
+	
+	echo "xquartz_version_result = ${xquartz_version_result}"
+	
+	if [ "${xquartz_version_result}" != "0" ]
+	then
+		echoGood "The version of the installed XQuartz is ${xquartz_installed_version}"
+		echo "Check if version is newer then the installed one"
+		
+		XQUARTZVERSION=$(pkgutil --pkg-info $XQUARTZPKGID | awk '/version/ { print $2 }')
+		MAJ=$(echo "$XQUARTZVERSION" | awk -F \. '{ print $1 }')
+		MIN=$(echo "$XQUARTZVERSION" | awk -F \. '{ print $2 }')
+		REV=$(echo "$XQUARTZVERSION" | awk -F \. '{ print $3 }')
+		
+		if [[ $MAJ -ge 2 && $MIN -ge 7 && $REV -ge 8 ]]
+		then
+			echoGood "Your version of XQuartx is $XQUARTZVERSION that is ok!"
+		else
+			installXQuartz
+		fi
+	fi
 else
-	echoGood "Your version of XQuartz is $xquartz - perfect."
+	installXQuartz
 fi
 
+# cat /Applications/Utilities/XQuartz.app/Contents/Info.plist | awk '/<key>CFBundleShortVersionString<\/key>/{getline; print}' | grep 2.7.6 && xquartz_version_result="0" || echo xquartz_version_result="1"
+# echo "xquartz_version_result=$xquartz_version_result"
+# if [ "$xquartz_version_result" != "0" ]
+# then
+# 	installXQuartz
+# else
+# 	echoGood "Your version of XQuartz is 2.7.6 - perfect."
+# fi
 
 lineBreak; echo "Ok, now you have to should have either...";lineBreak
 echo "1. Already had the correct version of XQuartz, so I'm continuing...";lineBreak
